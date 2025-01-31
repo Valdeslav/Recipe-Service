@@ -1,0 +1,31 @@
+version: '2'
+
+services:
+  recipe_app:
+    image: 'recipe-service:latest'
+    build:
+      context: ./..
+      dockerfile: ./docker/Dockerfile
+    container_name: recipe_app
+
+    depends_on:
+      - recipe_db
+    env_file:
+      - .env
+    ports:
+      - "8083:8080"
+      - "5008:5005"
+
+  recipe_db:
+    image: 'postgres:13.1-alpine'
+    container_name: recipe_db
+    env_file:
+      - .env
+    volumes:
+      - ../src/main/resources/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - recipe-db-data:/var/lib/postgresql/data
+    ports:
+      - "5435:5432"
+
+volumes:
+  recipe-db-data:
